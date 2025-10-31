@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sweet Rice Pudding & Spud</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to bottom, #ff69b4, #ffffff); /* Degradado rosa a blanco */
+            color: #333;
+            overflow-x: hidden;
+        }
+        /* Panel superior */
+        .top-panel {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background-color: rgba(255, 20, 147, 0.9);
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            animation: slideDown 0.5s ease-out;
+        }
+        .top-panel a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+            transition: color 0.3s;
+        }
+        .top-panel a:hover {
+            color: #ffe4e1;
+        }
+        /* Ajuste para el contenido debajo del panel */
+        .content {
+            margin-top: 60px;
+        }
+        header {
+            text-align: center;
+            padding: 50px 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 0 0 50px 50px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            animation: fadeIn 1s ease-in;
+        }
+        #logo {
+            width: 150px;
+            height: auto;
+            margin-bottom: 20px;
+            animation: fadeIn 1.5s ease-out; /* Cambiado a fadeIn para evitar movimiento lateral */
+        }
+        h1 {
+            font-size: 2.5em;
+            color: #ff1493;
+            margin: 0;
+            animation: slideInFromTop 1s ease-out;
+        }
+        /* Sección de foto del producto */
+        .product-photo {
+            text-align: center;
+            margin: 20px auto;
+            max-width: 600px;
+            animation: fadeInUp 1s ease-out;
+        }
+        .product-photo img {
+            width: 100%;
+            max-width: 400px;
+            border-radius: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease;
+        }
+        .product-photo img:hover {
+            transform: scale(1.05);
+        }
+        section {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            animation: fadeInUp 1s ease-out;
+        }
+        h2 {
+            color: #ff69b4;
+            text-align: center;
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+        p, ul {
+            font-size: 1.2em;
+            line-height: 1.6;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        li {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: rgba(255, 182, 193, 0.5);
+            border-radius: 10px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        li:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        .icon {
+            font-size: 1.5em;
+            margin-right: 10px;
+        }
+        /* Minijuego */
+        #minijuego {
+            text-align: center;
+            margin: 50px auto;
+            max-width: 1000px;
+        }
+        .game-area {
+            margin-top: 20px;
+            width: 100%;
+            height: 500px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+            position: relative;
+        }
+        .ingredient {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            animation: float 3s ease-in-out infinite;
+            display: block; /* Visible desde el inicio */
+        }
+        .ingredient:hover {
+            transform: scale(1.1);
+        }
+        .ingredient.moving {
+            transition: all 2s ease-in-out; /* Animación lenta para bajar a la olla */
+        }
+        .pot {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 100px;
+            display: block; /* Visible desde el inicio */
+        }
+        .fire {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 50px;
+            display: none;
+        }
+        .particle {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #00bfff;
+            border-radius: 50%;
+            animation: splash 1s ease-out forwards;
+        }
+        .finished-product {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            height: 200px;
+            cursor: pointer;
+            animation: bounceIn 1s ease-out;
+        }
+        .eating-stage {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            height: 200px;
+            cursor: pointer;
+            animation: fadeIn 1s ease-in;
+        }
+        .message {
+            display: none;
+            text-align: center;
+            font-size: 1.5em;
+            color: #ff69b4;
+            margin-top: 20px;
+            animation: fadeIn 1s ease-in;
+        }
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            color: #ff69b4;
+            animation: fadeIn 2s ease-in;
+        }
+        /* Animaciones */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slideInFromTop {
+            from { opacity: 0; transform: translateY(-50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes bounceIn {
+            0% { transform: scale(0.3) translate(-50%, -50%); opacity: 0; }
+            50% { transform: scale(1.05) translate(-50%, -50%); }
+            70% { transform: scale(0.9) translate(-50%, -50%); }
+            100% { transform: scale(1) translate(-50%, -50%); opacity: 1; }
+        }
+        @keyframes slideDown {
+            from { transform: translateY(-100%); }
+            to { transform: translateY(0); }
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        @keyframes flicker {
+            from { opacity: 1; transform: scale(1); }
+            to { opacity: 0.7; transform: scale(1.1); }
+        }
+        @keyframes splash {
+            from { opacity: 1; transform: scale(0); }
+            to { opacity: 0; transform: scale(2); }
+        }
+        @keyframes shrink {
+            from { transform: translateX(-50%) scale(1); }
+            to { transform: translateX(-50%) scale(0); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Panel superior -->
+    <div class="top-panel">
+        <div>¡Bienvenido a Sweet Rice Pudding & Spud!</div>
+        <nav>
+            <a href="#que-es">¿Qué es?</a>
+            <a href="#por-que">¿Por qué consumir?</a>
+            <a href="#minijuego">Minijuego</a>
+        </nav>
+    </div>
+
+    <div class="content">
+        <header>
+            <img id="logo" src="placeholder-logo.png" alt="Logo de Sweet Rice Pudding & Spud"> <!-- Reemplaza con la URL real del logo -->
+            <h1>“El sabor de la tradición en cada cucharada.”</h1>
+        </header>
+
+        <!-- Foto del producto -->
+        <div class="product-photo">
+            <img src="producto-foto.png" alt="Foto del producto Sweet Rice Pudding & Spud"> <!-- Reemplaza con la URL real de la foto del producto -->
+        </div>
+
+        <section id="que-es">
+            <h2>¿Qué es Sweet Rice Pudding & Spud?</h2>
+            <p>Sweet Rice Pudding & Spud es un emprendimiento dedicado a crear el más delicioso arroz con leche artesanal, combinando la receta tradicional con un toque moderno y especial.</p>
+            <p>Nuestro producto está elaborado con ingredientes naturales y de alta calidad: arroz, leche, azúcar, canela, vainilla, nuez moscada y leche condensada, cocinados lentamente para lograr una textura cremosa, un aroma irresistible y un sabor que te transporta a los recuerdos más dulces del hogar.</p>
+        </section>
+
+        <section id="por-que">
+            <h2>¿Por qué consumir Sweet Rice Pudding & Spud?</h2>
+            <p>Consumir Sweet Rice Pudding & Spud es darte un gusto dulce, natural y lleno de tradición. Cada porción está hecha con amor, ingredientes frescos y el toque casero que hace único a nuestro arroz con leche.</p>
+            <p><span class="icon">🌸</span> Porque…</p>
+            <ul>
+                <li><strong>Es 100% artesanal:</strong> hecho a mano, con cuidado y dedicación.</li>
+                <li><strong>Usamos ingredientes naturales:</strong> sin conservantes ni colorantes artificiales.</li>
+                <li><strong>Tiene un sabor auténtico:</strong> cremoso, dulce y con el aroma perfecto de canela y vainilla.</li>
+                <li><strong>Es práctico:</strong> viene en presentaciones ideales para disfrutar donde quieras.</li>
+                <li><strong>Te conecta con la tradición:</strong> un postre que recuerda los sabores de casa y los momentos en familia.</li>
+                <li><strong>Es versátil:</strong> perfecto para después de una comida, como merienda o para regalar dulzura a alguien especial.</li>
+            </ul>
+            <p><span class="icon">💛</span> Porque disfrutar de lo casero, hecho con amor, siempre sabe mejor....</p>
+        </section>
+
+        <!-- Minijuego -->
+        <section id="minijuego">
+            <h2>¡Juega y crea tu propio Arroz con Leche!</h2>
+            <div class="game-area">
+                <!-- Ingredientes dispersos (posiciones ajustadas a porcentajes para responsividad en móviles) -->
+                <img id="arroz" class="ingredient" src="arroz.png" alt="Arroz" style="top: 10%; left: 10%;">
+                <img id="leche" class="ingredient" src="leche.png" alt="Leche" style="top: 20%; left: 30%;">
+                <img id="azucar" class="ingredient" src="azucar.png" alt="Azúcar" style="top: 30%; left: 50%;">
+                <img id="canela" class="ingredient" src="canela.png" alt="Canela" style="top: 40%; left: 70%;">
+                <img id="vainilla" class="ingredient" src="vainilla.png" alt="Vainilla" style="top: 50%; left: 20%;">
+                <img id="nuez-moscada" class="ingredient" src="nuez-moscada.png" alt="Nuez Moscada" style="top: 60%; left: 40%;">
+                <img id="leche-condensada" class="ingredient" src="leche-condensada.png" alt="Leche Condensada" style="top: 70%; left: 60%;">
+                <!-- Olla (cambiada a imagen) -->
+                <img class="pot" src="pot.png" alt="Olla">
+                <!-- Fuego -->
+                <img class="fire" src="fire.png" alt="Fuego">
+                <!-- Producto terminado -->
+                <img class="finished-product" src="producto.png" alt="Producto Terminado">
+                <!-- Etapas de comer -->
+                <img class="eating-stage" src="producto1.png" alt="Etapa 1">
+                <img class="eating-stage" src="producto2.png" alt="Etapa 2">
+                <img class="eating-stage" src="producto3.png" alt="Etapa 3">
+                <img class="eating-stage" src="producto4.png" alt="Etapa 4">
+            </div>
+            <div class="message">¡Eso estuvo delicioso! ¿Qué tal si pruebas uno de nuestros productos en Sweet Rice Pudding & Spud?</div>
+        </section>
+
+        <footer>
+            <p>&copy; 2023 Sweet Rice Pudding & Spud. Todos los derechos reservados.</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const gameArea = document.querySelector('.game-area');
+            const pot = document.querySelector('.pot');
+            const fire = document.querySelector('.fire');
+            const finishedProduct = document.querySelector('.finished-product');
+            const message = document.querySelector('.message');
+            const ingredients = document.querySelectorAll('.ingredient');
+            const eatingStages = document.querySelectorAll('.eating-stage');
+            let addedIngredients = 0;
+            let eatingStep = 0;
+
+            // Función para reproducir sonidos (descomenta y añade archivos de sonido)
+            // function playSound(soundFile) {
+            //     const audio = new Audio(soundFile);
+            //     audio.play();
+            // }
+
+            // Función para animar el ingrediente bajando lentamente a la olla y luego desaparecer
+            ingredients.forEach(ingredient => {
+                ingredient.addEventListener('click', function() {
+                    // Calcular la posición de la olla
+                    const potRect = pot.getBoundingClientRect();
+                    const gameRect = gameArea.getBoundingClientRect();
+                    const targetX = potRect.left - gameRect.left + potRect.width / 2 - 40; // Centro de la olla
+                    const targetY = potRect.top - gameRect.top + potRect.height / 2 - 40;
+
+                    // Animar el movimiento
+                    ingredient.classList.add('moving');
+                    ingredient.style.left = targetX + 'px';
+                    ingredient.style.top = targetY + 'px';
+
+                    // Después de la animación, desaparecer y crear partículas
+                    setTimeout(() => {
+                        ingredient.style.display = 'none';
+                        addedIngredients++;
+                        // Partículas de agua en la olla
+                        for (let i = 0; i < 5; i++) {
+                            const particle = document.createElement('div');
+                            particle.classList.add('particle');
+                            particle.style.left = (targetX + 40 + Math.random() * 20 - 10) + 'px';
+                            particle.style.top = (targetY + 40 + Math.random() * 20 - 10) + 'px';
+                            gameArea.appendChild(particle);
+                            setTimeout(() => particle.remove(), 1000);
+                        }
+                        // playSound('add-sound.mp3');
+                        if (addedIngredients === ingredients.length) {
+                            // Cocinar
+                            fire.style.display = 'block';
+                            setTimeout(() => {
+                                pot.style.animation = 'shrink 2s ease-in forwards';
+                                fire.style.animation = 'shrink 2s ease-in forwards';
+                                setTimeout(() => {
+                                    pot.style.display = 'none';
+                                    fire.style.display = 'none';
+                                    finishedProduct.style.display = 'block';
+                                    // playSound('cook-done-sound.mp3');
+                                }, 2000);
+                            }, 1000);
+                        }
+                    }, 2000); // Tiempo de la animación
+                });
+            });
+
+            // Comer el producto terminado para iniciar las etapas
+            finishedProduct.addEventListener('click', function() {
+                finishedProduct.style.display = 'none';
+                eatingStages[0].style.display = 'block'; // Mostrar la primera etapa
+            });
+
+            // Event listeners para cada etapa de comer
+            eatingStages.forEach((stage, index) => {
+                stage.addEventListener('click', function() {
+                    stage.style.display = 'none';
+                    if (index < eatingStages.length - 1) {
+                        eatingStages[index + 1].style.display = 'block'; // Mostrar la siguiente etapa
+                        // playSound('eat-sound.mp3');
+                    } else {
+                        message.style.display = 'block'; // Mostrar el mensaje final
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
